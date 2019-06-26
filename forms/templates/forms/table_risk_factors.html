@@ -1,0 +1,67 @@
+{% extends "forms/table_base.html" %}
+{% load humanize %}
+{% load maxConseq %}
+{% load prettyHeader %}
+{% block table_title %}
+Risk Factors
+{% endblock%}
+{% block tables %}
+
+<div class="row">
+  {% for table in data %}
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2> {{ table.name }} </h2>
+        <ul class="nav navbar-right panel_toolbox">
+          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+          </li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
+      <div class="x_content">
+        <table id="{{ table.id }}" class="table table-striped table-bordered" width="100%">
+          <thead>
+            <tr>
+
+                {% for field, value in table.data.0.fields.items %}
+                  <th class="{{ field }}">{{ field|prettyHeader }}</th>
+                  {% endfor %}
+                  {% if table.name == "Risk Factor" %}
+                  <th class="max_consequence">Max Conseq</th>
+                  {% endif %}
+                  <th class="action">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for instance in table.data %}
+              <tr>
+                {% for field, value in instance.fields.items %}
+                  {% if "date" in field %}
+                    <td>{{ value|date:"Y-m-d"}}</td>
+                  {% elif "amount" in field or "loss" in field %}
+                    <td>{{ value|floatformat:"0"|intcomma }}</td>
+                  {% else %}
+                    <td>{{value|title}} </td>
+                  {% endif %}
+                {% endfor %}
+                {% if table.name == "Risk Factor" %}
+                <td>{{ instance.pk|maxConseq}}</td>
+                {% endif %}
+
+
+                <td><a href="{% url "forms:editRiskFactor" form_name=table.id form_id=instance.pk %}"><strong>Edit</strong></a></td>
+
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+
+</div>
+
+{% endblock %}

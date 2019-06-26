@@ -1,0 +1,153 @@
+{% extends "dashboard/base_site.html" %}
+{% load widget_tweaks %}
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="page-title">
+        <div class="title_left">
+          <h3>BNK Reporting Form</h3>
+        </div>
+
+
+      </div>
+      <div class="clearfix"></div>
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2 id='title'>{{ form_name }} {% block action %}Submission{% endblock %}</h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            {% if submitted %}
+              <div class="x_content">
+                  <p>The form has been submitted successfully!</p>
+              </div>
+            {% else %}
+            <div class="x_content">
+              <small>FIELDS WITH A STAR (*) ARE REQUIRED</small>
+              <br />
+              <form id="target-form" action="." method="POST" data-parsley-validate class="form-horizontal form-label-left">
+
+                {% for field in form %}
+
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12" for="first-name">{{ field.label }}
+                      {% if field.field.required %}
+                      <span class="required">*</span>
+                      {% endif %}
+                    </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                         {% render_field field class+="form-control col-md-7 col-xs-12" placeholder=field.help_text %}
+
+                    </div>
+                    {{ field.errors }}
+                </div>
+
+                {% endfor %}
+                {% csrf_token %}
+
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    {% block submit_button %}
+
+  		              <button class="btn btn-primary" type="reset">Reset</button>
+                    <button type="submit" class="btn btn-success">Submit</button>
+
+                    {% endblock %}
+                  </div>
+                </div>
+
+              </form>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div id = 'consequence' class="modal fade " tabindex="-1" role="dialog" aria-hidden="true" style="display: none; ">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel2">Consequence Matrix</h4>
+        </div>
+        <div class="modal-body">
+          <img src ="/static/images/consequence_1.png" style="width:100%;"></img>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div id = 'likelihood' class="modal fade " tabindex="-1" role="dialog" aria-hidden="true" style="display: none; ">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel3">Likelihood Definition</h4>
+        </div>
+        <div class="modal-body">
+          <img src ="/static/images/likelihood.png" style="width:100%;"></img>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+{% block custom_js%}
+
+<script>
+  $.expr[":"].contains = $.expr.createPseudo(function(arg) {
+    return function( elem ) {
+        return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+      };
+  });
+  $("label:contains('Consequence')").append(`<small><a style='color:red; cursor:pointer' data-toggle='modal' data-target='#consequence'>(?)</a></small>`)
+  $("label:contains('likelihood')").append(`<small><a style='color:red; cursor:pointer' data-toggle='modal' data-target='#likelihood'>(?)</a></small>`)
+
+
+
+</script>
+<script>
+  var loss_event_categories =  {{ loss_event_categories|safe }}
+  $("#id_operational_loss_event_tier_1_category").change(function(e){
+      var selected = this.value
+      var second_level = loss_event_categories[selected]
+      $("#id_operational_loss_event_tier_2_category option").remove()
+      $("#id_operational_loss_event_tier_2_category").append("<option value='' selected=''>---------</option>")
+      Object.keys(second_level).forEach(function(ele){
+          $("#id_operational_loss_event_tier_2_category").append(`<option value="${ele}">${ele}</option>`)
+      })
+  })
+  $("#id_operational_loss_event_tier_2_category").change(function(e){
+      var level_1 = $("#id_operational_loss_event_tier_1_category").children("option:selected").val()
+
+      var selected = this.value
+      var third_level = loss_event_categories[level_1][selected]
+      $("#id_operational_loss_event_activity option").remove()
+      $("#id_operational_loss_event_activity").append("<option value='' selected=''>---------</option>")
+      third_level.forEach(function(ele){
+          $("#id_operational_loss_event_activity").append(`<option value="${ele}">${ele}</option>`)
+      })
+  })
+</script>
+{% endblock custom_js%}

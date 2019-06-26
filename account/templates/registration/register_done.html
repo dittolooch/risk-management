@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="form-title">Create account</h2>
+<h3>Welcome {{ new_user.first_name }}!</h3>
+<p>Your account has been successfully created. We have sent you an account activation email. Please click the button in the email to activate.</p>
+<p>Please check your spam/junk folder if you do not see the email in your main inbox.</p>
+<p class="loginhere">
+
+    Don't have an account? <a href="{% url "register" %}" class="loginhere-link">Sign Up</a><br>
+    Activated the account? <a href="{% url "login" %}" class="loginhere-link">Login</a>
+</p>
+{% endblock %}

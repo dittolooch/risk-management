@@ -1,0 +1,100 @@
+<div class="left_col scroll-view">
+  <div class="navbar nav_title" style="border: 0;">
+      <a href="{% url "dashboard:index" %}" class="site_title"><img src="/static/images/bnk.png" style="width:50px;"> </img><span></span></a>
+  </div>
+
+  <div class="clearfix"></div>
+
+  <!-- menu profile quick info -->
+
+  <!-- /menu profile quick info -->
+
+  <br />
+
+  <!-- sidebar menu -->
+  <div id="sidebar-menu" class="main_menu_side  hidden-print main_menu">
+    <div class="menu_section">
+      <h3>OP RISK & COMPLIANCE</h3>
+      <ul class="nav side-menu">
+        <li><a><i class="fa fa-home"></i> Dashboards <span class="fa fa-chevron-down"></span></a>
+          <ul class="nav child_menu">
+            <li><a href="{% url "dashboard:index" %}">Main</a></li>
+            <li><a href="{% url "dashboard:incident" %}">Breach & Incident</a></li>
+            <li><a href="{% url "dashboard:complaint" %}">Complaint & Dispute</a></li>
+
+          </ul>
+        </li>
+        <li><a><i class="fa fa-fighter-jet"></i> Risk Factors & Controls <span class="fa fa-chevron-down"></span></a>
+          <ul class="nav child_menu">
+            <li><a href="{% url "forms:addRiskFactor" form_name="risk_factor_add" %}">Add Risk Factor</a></li>
+            <li><a href="{% url "forms:display_form" form_name="risk_control" %}">Add Risk Control</a></li>
+            <li><a href="{% url "forms:risk_factor_review"  %}">Table View</a></li>
+
+
+
+
+
+          </ul>
+        </li>
+        <li><a><i class="fa fa-edit"></i> Forms <span class="fa fa-chevron-down"></span></a>
+          <ul class="nav child_menu">
+            <li><a href="{% url "forms:display_form" form_name="breach_and_incident" %}">Breach & Incident</a></li>
+            <li><a href="{% url "forms:display_form" form_name="complaint_and_dispute" %}">Complaint & Dispute</a></li>
+            <li><a href="{% url "forms:display_form" form_name="fraud" %}">Fraud</a></li>
+            <li><a href="{% url "forms:display_wizard" form_name="hindsight_review" %}">Hindsight Review</a></li>
+            <li><a href="{% url "forms:review" %}">Table View</a></li>
+
+
+          </ul>
+        </li>
+
+        <li><a><i class="fa fa-calendar"></i> Compliance Schedule <span class="fa fa-chevron-down"></span></a>
+          <ul class="nav child_menu">
+            <li><a href="{% url "compliance_schedule:addItem" %}">Add Schedule Item</a></li>
+            <li><a href="{% url "compliance_schedule:viewCompliance" %}">Table View</a></li>
+          </ul>
+        </li>
+        <li><a><i class="fa fa-bank"></i> Policy Review Schedule <span class="fa fa-chevron-down"></span></a>
+          <ul class="nav child_menu">
+            <li><a href="{% url "compliance_schedule:addPolicy" %}">Add Policy Item</a></li>
+            <li><a href="{% url "compliance_schedule:viewPolicy" %}">Table View</a></li>
+          </ul>
+        </li>
+
+      </ul>
+    </div>
+    <div class="menu_section">
+      <h3>Other Tools</h3>
+      <ul class="nav side-menu">
+        <li><a><i class="fa fa-bug"></i> Credit <span class="fa fa-chevron-down"></span></a>
+          <ul class="nav child_menu">
+            <li><a href="e_commerce.html">Volatility</a></li>
+
+          </ul>
+        </li>
+
+
+      </ul>
+    </div>
+  </div>
+  <!-- /sidebar menu -->
+
+  <!-- /menu footer buttons -->
+<!--
+  <div class="sidebar-footer hidden-small">
+    <a data-toggle="tooltip" data-placement="top" title="Settings">
+      <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+    </a>
+    <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+      <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+    </a>
+    <a data-toggle="tooltip" data-placement="top" title="Lock">
+      <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+    </a>
+    <a data-toggle="tooltip" data-placement="top" title="Logout" href="{% url "logout" %}">
+      <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+    </a>
+  </div>
+-->
+  <!-- /menu footer buttons -->
+</div>

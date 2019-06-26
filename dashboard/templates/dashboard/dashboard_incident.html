@@ -1,0 +1,187 @@
+{% extends "dashboard/dashboard_base.html" %}
+{% load humanize %}
+
+{% block title %} Breach & Incident Dashboard {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+{% endblock stylesheets %}
+
+{% block charts %}
+
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="dashboard_graph">
+
+      <div class="row x_title">
+        <div class="col-md-6">
+          <h3>Daily Incident Counts</h3>
+        </div>
+      </div>
+
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+              <h2 id="Breach_and_Incident_heatmap_title">Incident Heatmap - Banking</h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                      <i class="fa fa-wrench"></i>
+                  </a>
+                  <ul class="dropdown-menu" role="menu">
+                      <li><a href="javascript:update_heatmap('Breach and Incident_heatmap','Banking')">Banking</a></li>
+                      <li><a href="javascript:update_heatmap('Breach and Incident_heatmap','Wholesale')">Wholesale</a></li>
+                      <li><a href="javascript:update_heatmap('Breach and Incident_heatmap','Aggregation')">Aggregation</a></li>
+                  </ul>
+                </li>
+
+
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+
+              <div id="Breach and Incident_heatmap" style="height:450px;"></div>
+
+            </div>
+        </div>
+      </div>
+
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</div>
+<br>
+<div class="row">
+  {% with "Group Banking Wholesale Aggregation" as list %}
+  {% for bu in list.split %}
+  <div class="col-md-3 col-sm-3, col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Open Incidents - {{ bu }} </h2>
+          <ul class="nav navbar-right panel_toolbox">
+              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+              </li>
+
+              <li><a class="close-link"><i class="fa fa-close"></i></a>
+              </li>
+            </ul>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+
+          <div id="open_incident_{{ bu }}" style="height:300px;"></div>
+
+        </div>
+    </div>
+
+  </div>
+  {% endfor %}
+  {% endwith %}
+</div>
+<div class="row">
+  <div class="col-md-6 col-sm-6 col-xs-12">
+    <div class="x_panel">
+        <div class="x_title">
+          <h2>Count of Breaches & Incidents by Root Cause</h2>
+          <ul class="nav navbar-right panel_toolbox">
+              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+              </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="javascript:render_stacked_bar_chart('root_cause', bar_chart_data.root_cause.stacked)">Group</a>
+                  </li>
+                  <li><a href="javascript:render_bar_chart('root_cause', bar_chart_data.root_cause.non_stacked, 'Banking')">Banking</a>
+                  </li>
+                  <li><a href="javascript:render_bar_chart('root_cause', bar_chart_data.root_cause.non_stacked, 'Wholesale')">Wholesale</a>
+                  </li>
+                  <li><a href="javascript:render_bar_chart('root_cause', bar_chart_data.root_cause.non_stacked, 'Aggregation')">Aggregation</a>
+                  </li>
+
+                </ul>
+              </li>
+              <li><a class="close-link"><i class="fa fa-close"></i></a>
+              </li>
+            </ul>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+          <div id="root_cause" style="height:370px;"></div>
+        </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-sm-6 col-xs-12">
+    <div class="x_panel">
+        <div class="x_title">
+          <h2>Count of Breaches & Incidents by Risk Factor</h2>
+          <ul class="nav navbar-right panel_toolbox">
+              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+              </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="javascript:render_stacked_bar_chart('risk_factor', bar_chart_data.risk_factor.stacked)">Group</a>
+                  </li>
+                  <li><a href="javascript:render_bar_chart('risk_factor', bar_chart_data.risk_factor.non_stacked, 'Banking')">Banking</a>
+                  </li>
+                  <li><a href="javascript:render_bar_chart('risk_factor', bar_chart_data.risk_factor.non_stacked, 'Wholesale')">Wholesale</a>
+                  </li>
+                  <li><a href="javascript:render_bar_chart('risk_factor', bar_chart_data.risk_factor.non_stacked, 'Aggregation')">Aggregation</a>
+                  </li>
+
+                </ul>
+              </li>
+              <li><a class="close-link"><i class="fa fa-close"></i></a>
+              </li>
+            </ul>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+
+          <div id="risk_factor" style="height:370px;"></div>
+
+        </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock charts %}
+
+{% block custom_js%}
+<script>
+    bu_color = {
+        "Banking":"rgba(26,187,156,0.8)",
+        "Wholesale":"rgba(231,76,60,0.8)",
+        "Aggregation":"rgba(52,152,219,0.8)"
+    }
+    var heatmap_data = {{ heatmap_data|safe }}
+    var bar_chart_data = {{ bar_chart_data|safe }};
+    var gauges_data = {{ gauges_data|safe}}
+
+    Object.keys(bar_chart_data).forEach(function(chart_id){
+      var stacked_data = bar_chart_data[chart_id].stacked
+      render_stacked_bar_chart(chart_id, stacked_data)
+    })
+
+    gauges_data.forEach(function(data){
+      bu = data.business_unit
+      count = data.count
+      max_number = bu=="Group"?50:20
+      render_gauge(`open_incident_${bu}`, count, "Open Incidents",max_number )
+    })
+
+    Object.keys(heatmap_data).forEach(function(chart_id){
+        var chart_data = heatmap_data[chart_id]
+        var chart_name = heatmap_data[chart_id]["chart_name"]
+        render_heatmap(chart_id, chart_data, "Banking", chart_name);
+    })
+
+
+
+</script>
+
+{% endblock custom_js%}

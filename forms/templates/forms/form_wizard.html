@@ -1,0 +1,307 @@
+{% extends "dashboard/base_site.html" %}
+{% load widget_tweaks %}
+
+
+
+
+
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="page-title">
+        <div class="title_left">
+          <h3>BNK Reporting Form</h3>
+        </div>
+
+
+      </div>
+      <div class="clearfix"></div>
+
+      <div class="row">
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>{{ form_name }} Submission <span id='updated_time' style="display:none">Last Saved:</span></h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+
+
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            {% if submitted %}
+              <div class="x_content">
+                  <p>The form has been submitted successfully!</p>
+              </div>
+            {% else %}
+              <div class="x_content">
+
+
+              <!-- Smart Wizard -->
+
+              <div id="wizard" class="form_wizard wizard_horizontal">
+                <ul class="wizard_steps">
+                  {% for section in sections %}
+                  <li>
+                    <a href="#step-{{ section.id }}">
+                      <span class="step_no">{{ section.id }}</span>
+
+                    </a>
+                  </li>
+                  {% endfor%}
+
+                </ul>
+                <form id="target_form" method="POST" action="." >
+                {% for section in sections %}
+                <div id="step-{{section.id}}">
+                  <div class="container" style="padding:0% 20%;">
+                  <h2 class="StepTitle">Step {{ section.id}}</h2>
+                  <span class="section">{{ section.name }}</span>
+                  <div class="form-horizontal form-label-left">
+
+
+                      {% for field in form%}
+                        {% if field.field.widget.attrs.section == section.id %}
+                        <div class="form-group">
+                          <label>{{ field.label }}</label> <small style="color:red">{{ field.errors }}</small>
+                        {% render_field field class+="form-control" %}
+                        </div>
+                        {%elif not field.field.widget.attrs.section and section.id == 1 %}
+                        <div class="form-group">
+                          <label>{{ field.label }}</label><small style="color:red">{{ field.errors }}</small>
+                        {% render_field field class+="form-control" %}
+
+                        </div>
+                        {% endif %}
+                      {% endfor %}
+
+                  </div>
+                  </div>
+
+                </div>
+
+
+                {% endfor %}
+                {% csrf_token %}
+                </form>
+
+
+
+              </div>
+              <!-- End SmartWizard Content -->
+
+
+
+
+
+            {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id = 'modal' class="modal fade " tabindex="-1" role="dialog" aria-hidden="true" style="display: none; ">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+          </button>
+          <h4 class="modal-title" id="modal-title">Saved</h4>
+        </div>
+        <div class="modal-body">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+  <!-- jQuery Smart Wizard -->
+  <script src="/static/vendors/jQuery-Smart-Wizard/js/jquery.smartWizard.js?v=3"></script>
+{% endblock javascripts %}
+{% block custom_js%}
+<script type="text/javascript">
+  var edit_url = "{% url 'forms:editWizard' form_name=html_form_name form_id='TO_REPLACE' %}"
+  {% if form_id %}
+  var created_id = {{form_id}};
+  {% else %}
+  var created_id;
+  {% endif %}
+
+function in_edit_mode(){
+  var created = false
+  if ($("#step-1 input").first().val()) {
+    created = true
+  }
+  return created;
+
+}
+class StateMachine {
+  constructor(edit_url, created_id, in_edit_mode){
+    this.edit_url = edit_url;
+    this.created_id = created_id;
+    this.in_edit_mode = in_edit_mode;
+    this.created = in_edit_mode?true:false;
+    this.creating = false;
+    this.compelted = false;
+  }
+  is_completed(){
+    var answer = true;
+    $('select :selected').each(function(i, e){
+      if (!$(e).val()){
+        answer = false;
+      }
+    })
+
+    return answer
+  }
+  get_unfinished_html(){
+    var html = "";
+    var unfinished_sections = [];
+
+    $(".StepTitle").each(function(i, step_title){
+
+      var title_text = $(step_title).text()
+      console.log(title_text)
+      $(step_title).parent('.container').find("select :selected").each(function(j, selected){
+        if (!$(selected).val()){
+          console.log($(selected).val())
+          // not selected, title should be pushed
+          if (!unfinished_sections.includes(title_text)){
+            unfinished_sections.push(title_text);
+          }
+
+        }
+      })
+    })
+    unfinished_sections.forEach(function(sec, i ){
+      html = html + "<p>" + sec + "<p>"
+    })
+
+
+    return html
+
+  }
+  section_one_completed(){
+    var section_complete = true
+    $("#step-1 input, #step-1 select").each(function(i,e){
+      if (!$(e).val()){
+        section_complete = false
+      }
+    })
+    return section_complete;
+  }
+  get_lock(){
+    while (this.locked){
+        console.log('locked. not available')
+    }
+    this.locked = true;
+  }
+  release_lock(){
+    console.log('lock released');
+    this.locked = false;
+  }
+
+  set_saved_time(){
+    var today = new Date();
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var dateTime = date+' '+time;
+    $("#updated_time").css('display','inline');
+    $("#updated_time").text(`Last Atuo Saved: ${dateTime}`);
+    $("#updated_time").animate({
+          backgroundColor: "#aa0000",
+          color: "#fff",
+        }, 1000 )
+  }
+  create(){
+
+    var that = this;
+    that.creating = true;
+
+    $.post(".", $('#target_form').serialize(),
+      function(data){
+        console.log('created ok');
+
+        that.created_id = data.id;
+        that.set_saved_time();
+        that.created = true;
+        that.creating = false;
+      },
+      'json'
+    );
+
+
+  }
+  update(){
+
+    var that = this;
+
+    $.post(
+      that.edit_url.replace('TO_REPLACE', that.created_id),
+      $('#target_form').serialize(),
+      function(data){
+      console.log('updated ok');
+
+      that.set_saved_time();
+      },
+    );
+  }
+}
+  stateMachine = new StateMachine(edit_url, created_id, in_edit_mode())
+  $(document).ready(function(){
+    setInterval(function(){
+        if (stateMachine.creating){
+          return
+        } else if (stateMachine.in_edit_mode || stateMachine.created){
+          stateMachine.update()
+        } else {
+          //not in edit mode nor created. check if section one done.
+          if (stateMachine.section_one_completed()){
+              stateMachine.create();
+          }
+        }
+    }, 10000);
+  })
+
+  $('#wizard').smartWizard({
+    onFinish: function(){
+      $(".modal-body").html("")
+      if (!stateMachine.section_one_completed()){
+        $('#modal-title').text('Hmm...')
+        $('.modal-body').append('<p>You are not allowed to save a draft before completing Step 1. Please complete Step 1 first.</p>')
+        $("#modal").modal('show')
+        return
+      } else if (stateMachine.created || stateMachine.in_edit_mode) {
+        stateMachine.update()
+      } else {
+        // section one completed, but not created nor in edit mode.
+        stateMachine.create()
+      }
+      $('#modal-title').text('Saved')
+      $('.modal-body').append('<p>The hindsight review has been successfully saved. You can create a new hindsight review <a style="color:red" href="{% url 'forms:display_wizard' form_name='hindsight_review' %}">here</></p>')
+
+      if (!stateMachine.is_completed()){
+        $('.modal-body').append('<p>Please note that your submission is not yet completed. You can come back later to Forms->Table View to pick up where you left off.')
+        $('.modal-body').append('<p>The unfinished sections are: </p>')
+        $('.modal-body').append(stateMachine.get_unfinished_html());
+      }
+      $("#modal").modal('show')
+    },
+  })
+
+
+</script>
+{% endblock custom_js%}

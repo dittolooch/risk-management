@@ -1,0 +1,152 @@
+{% extends "dashboard/base_site.html" %}
+{% load maxConseq %}
+{% load humanize %}
+{% load prettyHeader %}
+{% block title %} Tables {% endblock title %}
+{% block stylesheets %}
+  {{ block.super }}
+  <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+  <link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+  <link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+  <link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+  <link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+  <style>
+  
+
+  </style>
+{% endblock stylesheets %}
+{% block content %}
+
+  <div class="right_col" role="main">
+
+
+
+    <div class="">
+      <div class="page-title">
+        <div class="title_left">
+          <h3>{% block table_titles %}  {% endblock %}</h3>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+      {% block tables %}
+
+      <div class="row">
+        {% for table in data %}
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2> {{ table.name }} </h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <table id="{{ table.id }}" class="table table-striped table-bordered" width="100%">
+                <thead>
+                  <tr>
+
+                      {% for field, value in table.data.0.fields.items %}
+                        <th class="{{ field }}">{{ field|prettyHeader }}</th>
+                        {% endfor %}
+                        {% if table.name == "Risk Factor" %}
+                        <th class="max_consequence">Max Conseq</th>
+                        {% endif %}
+                        <th class="action">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for instance in table.data %}
+                    <tr>
+                      {% for field, value in instance.fields.items %}
+                        {% if "date" in field %}
+                          <td>{{ value|date:"Y-m-d"}}</td>
+                        {% elif "amount" in field or "loss" in field %}
+                          <td>{{ value|floatformat:"0"|intcomma }}</td>
+                        {% else %}
+                          <td>{{value|title}} </td>
+                        {% endif %}
+                      {% endfor %}
+                      {% if table.name == "Risk Factor" %}
+                      <td>{{ instance.pk|maxConseq}}</td>
+                      {% endif %}
+
+                      {% if "Hindsight" in table.name %}
+                      <td><a href="{% url "forms:editWizard" form_name=table.id form_id=instance.pk %}"><strong>Edit</strong></a></td>
+                      {% else %}
+                      <td><a href="{% url "forms:edit" form_name=table.id form_id=instance.pk %}"><strong>Edit</strong></a></td>
+                      {% endif %}
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+
+      </div>
+
+      {% endblock %}
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+  <!-- Datatables -->
+  <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script src="/static/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+  <script src="/static/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+  <script src="/static/vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
+  <script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+  <script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+  <script src="/static/vendors/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+  <!-- <script src="/static/vendors/datatables.net-buttons/js/buttons.print.min.js"></script> -->
+  <!-- <script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+  <script src="/static/vendors/jszip/dist/jszip.min.js"></script>
+  <script src="/static/vendors/pdfmake/build/pdfmake.min.js"></script>
+  <script src="/static/vendors/pdfmake/build/vfs_fonts.js"></script> -->
+
+  <script>
+
+    table_config = {{ table_config|safe  }}
+    Object.keys(table_config).forEach(function(table_name){
+      $(`#${table_name}`).DataTable({
+        dom: "Bfrtip",
+        buttons: [
+              {
+                extend:'colvis',
+                columns:':gt(0)',
+                className:'btn-sm',
+                text:"Columns"
+
+              },
+              {
+                  extend: "copy",
+                  className: "btn-sm"
+              },
+              {
+                  extend: "csv",
+                  className: "btn-sm"
+              },
+
+        ],
+        order: [[0, 'desc']],
+        responseive:true,
+        columnDefs:[
+          {'visible':true,'targets':table_config[table_name].visible_indices  },
+          {'visible':false,'targets':"_all"}
+
+        ]
+
+      })
+    })
+
+    </script>
+{% endblock javascripts %}

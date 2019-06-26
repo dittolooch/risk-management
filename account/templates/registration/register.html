@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+ <form method="POST" action="." id="signup-form" class="signup-form">
+    <h2 class="form-title">Create account</h2>
+    {% for field in form %}
+     
+    <div class="form-group">
+        <p>{{ field.widget.input_type }}</p>
+        
+        {% render_field field class+="form-input" placeholder=field.label %}
+
+        {{ field.errors }}
+        
+    </div>
+
+    {% endfor %}
+     {% csrf_token %}
+    <div class="form-group">
+        <input type="submit" name="submit" id="submit" class="form-submit" value="Sign up"/>
+    </div>
+</form>
+<p class="loginhere">
+    Already have an account ? <a href="{% url "login" %}" class="loginhere-link">Login here</a>
+</p>
+
+
+{% endblock %}

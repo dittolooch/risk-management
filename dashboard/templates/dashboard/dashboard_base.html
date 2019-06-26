@@ -1,0 +1,46 @@
+{% extends "dashboard/base_site.html" %}
+{% load humanize %}
+
+{% block title %} Dashboard 1 {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <!-- top tiles -->
+    <div class="row tile_count">
+      {% for stat in dashboard_top_data%}
+      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-tag"></i> {{ stat.0 }}</span>
+        <div class="count">{{ stat.1|intcomma}}</div>
+
+        <span class="count_bottom">
+          {% if stat.2 < 0 %}
+            <i class="green"><i class="fa fa-sort-desc"></i>{{ stat.2|floatformat:"0"|intcomma }}% </i> from last period
+          {% else %}
+            <i class="red"><i class="fa fa-sort-asc"></i>{{ stat.2|floatformat:"0"|intcomma }}% </i> from last period
+          {% endif %}
+        </span>
+
+      </div>
+      {% endfor %}
+
+    <!-- /top tiles -->
+    {% block charts %}
+    {% endblock charts %}
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+  <!-- DateJS -->
+  <script src="/static/vendors/DateJS/build/date.js"></script>
+  <script src="/static/vendors/echarts/dist/echarts.min.js"></script>
+  <!-- Warren Cheng -->
+  <script type="text/javascript" src="/static/custom_js/barchart.js"></script>
+  <script type="text/javascript" src="/static/custom_js/gauge.js"></script>
+  <script type="text/javascript" src="/static/custom_js/heatmap.js"></script>
+  <script type="text/javascript" src="/static/custom_js/index.js?v=1.0"></script>
+{% endblock javascripts %}

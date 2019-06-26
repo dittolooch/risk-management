@@ -1,0 +1,82 @@
+{% extends "forms/table_base.html" %}
+{% load humanize %}
+{% load datediff %}
+{% load prettyHeader %}
+{% load lastCompleted %}
+
+{% block tables %}
+<div class="row">
+  {% for table in data %}
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2> {{ table.name }} </h2>
+        <ul class="nav navbar-right panel_toolbox">
+          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+          </li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
+      <div class="x_content">
+        <table id="{{ table.id }}" class="table table-striped table-bordered" width="100%">
+          <thead>
+            <tr>
+
+                {% for field, value in table.data.0.fields.items %}
+                  <th class="{{ field }}">{{ field|prettyHeader }}</th>
+                  {% endfor %}
+
+                  <th class="last_completion_date">Last Completion Date</th>
+                  <th class="action">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for instance in table.data %}
+              <tr>
+                {% for field, value in instance.fields.items %}
+                  {% if "date" in field %}
+                    <td>{{ value|date:"Y-m-d"}}</td>
+                  {% elif "amount" in field or "loss" in field %}
+                    <td>{{ value|floatformat:"0"|intcomma }}</td>
+                  {% elif value == "DONE" %}
+                  <td><i class="green">{{ value }}</i></td>
+                  {% elif value == "PENDING" %}
+                  <td><i class="blue">{{ value }}</i></td>
+                  {% elif value == "OVERDUE" %}
+                  <td><i class="red">{{ value }}</i></td>
+                  {% else %}
+                  <td> {{value}} </td>
+                  {% endif %}
+                {% endfor %}
+
+
+                <td>
+                    {{ instance.pk|lastCompleted|date:"Y-m-d"  }}
+                </td>
+                <td><a href="{% url "compliance_schedule:updateCompliance" form_id=instance.pk %}"><strong>Edit</strong></a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+</div>
+{% endblock %}
+
+
+
+
+                    <td>
+                      {% if item.status == "DONE" %}
+                      <i class="green">{{ item.status }}</i>
+                      {% elif item.status == "PENDING" %}
+                      <i class="blue">{{ item.status }}</i>
+                      {% else %}
+                      <i class="red">{{ item.status }}</i>
+                      {% endif %}
+
+
+                    </td>

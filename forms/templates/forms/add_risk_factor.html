@@ -1,0 +1,155 @@
+{% extends "forms/submission.html" %}
+{% block custom_js %}
+
+<script>
+    var risks = {{ risks|safe }}
+
+    $("#id_risk_category_1").change(function(e){
+        var selected = this.value
+        var second_level = risks[selected]
+        $("#id_risk_category_2 option").remove()
+        $("#id_risk_category_2").append("<option value='' selected=''>---------</option>")
+        Object.keys(second_level).forEach(function(ele){
+            $("#id_risk_category_2").append(`<option value="${ele}">${ele}</option>`)
+        })
+    })
+    $("#id_risk_category_2").change(function(e){
+        var level_1 = $("#id_risk_category_1").children("option:selected").val()
+
+        var selected = this.value
+        var third_level = risks[level_1][selected]
+        $("#id_risk_category_3 option").remove()
+        $("#id_risk_category_3").append("<option value='' selected=''>---------</option>")
+        third_level.forEach(function(ele){
+            $("#id_risk_category_3").append(`<option value="${ele}">${ele}</option>`)
+        })
+    })
+</script>
+
+<script>
+  class CalculatedFiller{
+    constructor(){
+      this.risk_rating = [
+        ['1. LOW','1. LOW','1. LOW','2. MODERATE','3. HIGH'],
+        ['1. LOW','1. LOW','2. MODERATE','3. HIGH','4. EXTREME'],
+        ['1. LOW','2. MODERATE','3. HIGH','4. EXTREME','4. EXTREME',],
+        ['2. MODERATE','3. HIGH','3. HIGH','4. EXTREME','4. EXTREME',],
+        ['2. MODERATE','3. HIGH','4. EXTREME','4. EXTREME','4. EXTREME',],
+      ]
+      this.likelihood = [
+        '1. RARE',
+        '2. UNLIKELY',
+        '3. POSSIBLE',
+        '4. LIKELY',
+        '5. ALMOST CERTAIN',
+      ]
+    }
+    get_max_consequence(){
+      var max = 0;
+      $("select[id*='consequence']").each(function(i,e){
+        var selected = $(e).find("option:selected").val()
+        if (selected){
+          selected  = parseInt(selected[0])
+          max = selected > max?selected:max
+        }
+
+      })
+      return max;
+    }
+    fill_initial_risk_rating(){
+      try{
+        var max_conseq = this.get_max_consequence()
+        var initial_likelihood = parseInt($('#id_initial_likelihood :selected').val()[0])
+        let initial_risk_rating = this.risk_rating[initial_likelihood-1][max_conseq-1]
+        console.log(initial_risk_rating)
+        $(`#id_initial_risk_rating option[value="${initial_risk_rating}"]`).prop('selected',true)
+      }
+      catch (error){
+        console.log(error)
+      }
+
+    }
+    fill_residual_likelihood(){
+      try {
+        let control_effectiveness = parseInt($("#id_control_effectiveness").val())/100
+        var initial_likelihood = parseInt($('#id_initial_likelihood :selected').val()[0])
+        var residual_likelihood = Math.max(Math.round((1-control_effectiveness)*initial_likelihood,0),1)
+        console.log(`residual_likelihood=${residual_likelihood}`)
+        $(`#id_residual_likelihood option[value="${this.likelihood[residual_likelihood-1]}"]`).prop('selected',true)
+
+      }
+      catch (error){
+        console.log(error)
+      }
+
+    }
+    fill_residual_risk_rating(){
+      try {
+        let residual_likelihood = parseInt($('#id_residual_likelihood :selected').val()[0])
+        let max_conseq = this.get_max_consequence()
+        let residual_risk_rating = this.risk_rating[residual_likelihood-1][max_conseq-1]
+        $(`#id_residual_risk_rating option[value="${residual_risk_rating}"]`).prop('selected',true)
+        if (residual_risk_rating != $('#id_previous_residual_risk_rating').val()){
+          $('#id_reason_for_change').attr('disabled',false)
+        } else {
+          $('#id_reason_for_change').attr('disabled',true)
+        }
+
+      }
+      catch (error){
+        console.log(error)
+      }
+
+
+    }
+    fill_residual_score(){
+      try{
+        let residual_likelihood = parseInt($('#id_residual_likelihood :selected').val()[0])
+        let max_conseq = this.get_max_consequence()
+        $("#id_current_residual_score").val(max_conseq * residual_likelihood)
+
+      }
+      catch(error){
+        console.log(error)
+      }
+
+    }
+    fill_line_of_defense(){
+      try{
+        if ( $("#id_risk_owner").val() == "Chief Risk Officer"){
+          $("#id_line_of_defense").val(2)
+        } else {
+          $("#id_line_of_defense").val(1)
+        }
+
+
+      } catch (error){
+        console.log(error)
+      }
+
+
+    }
+
+  }
+  $(document).ready(function(){
+    if( $('#title').text().includes('Risk Factor')){
+      console.log("run!!")
+      filler = new CalculatedFiller()
+      $("#target-form").change(function(){
+        console.log('change')
+        filler.fill_initial_risk_rating()
+        filler.fill_residual_likelihood()
+        filler.fill_residual_risk_rating()
+        filler.fill_residual_score()
+        filler.fill_line_of_defense()
+      })
+
+
+    } else {
+      console.log('not risk factor')
+    }
+  }
+)
+
+</script>
+{% endblock %}

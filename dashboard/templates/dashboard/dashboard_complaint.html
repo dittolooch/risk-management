@@ -1,0 +1,271 @@
+{% extends "dashboard/dashboard_base.html" %}
+{% load humanize %}
+
+{% block title %} Complaint & Dispute Dashboard {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+{% endblock stylesheets %}
+
+{% block charts %}
+
+<div class="row">
+  <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="dashboard_graph">
+      <div class="row x_title">
+        <div class="col-md-6">
+          <h3>Daily Complaint Counts</h3>
+        </div>
+      </div>
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+              <h2 id="Complaint and Dispute_heatmap_title">Complaint Heatmap - Banking</h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                      <i class="fa fa-wrench"></i>
+                  </a>
+                  <ul class="dropdown-menu" role="menu">
+                      <li><a href="javascript:update_heatmap('Complaint and Dispute_heatmap','Banking')">Banking</a></li>
+                      <li><a href="javascript:update_heatmap('Complaint and Dispute_heatmap','Wholesale')">Wholesale</a></li>
+                      <li><a href="javascript:update_heatmap('Complaint and Dispute_heatmap','Aggregation')">Aggregation</a></li>
+                  </ul>
+                </li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div id="Complaint and Dispute_heatmap" style="height:450px;"></div>
+            </div>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</div>
+<br>
+<div class="row">
+    {% with "Group Banking Wholesale Aggregation" as list %}
+    {% for bu in list.split %}
+    <div class="col-md-3 col-sm-3, col-xs-12">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>Open Complaints - {{ bu }} </h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+
+                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                </li>
+              </ul>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+
+            <div id="open_complaint_{{ bu }}" style="height:300px;"></div>
+
+          </div>
+      </div>
+
+    </div>
+    {% endfor %}
+    {% endwith %}
+</div>
+<div class="row">
+    <div class="col-md-6 col-sm-4 col-xs-12">
+      <div class="x_panel">
+          <div class="x_title">
+            <h2>Count of Complaints & Disputes by Category</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li>
+                  <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                    <i class="fa fa-wrench"></i>
+                  </a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li>
+                      <a href="javascript:render_stacked_bar_chart('category', bar_chart_data.category.stacked)">Group</a>
+                    </li>
+                    <li>
+                      <a href="javascript:render_bar_chart('category', bar_chart_data.category.non_stacked, 'Banking')">Banking</a>
+                    </li>
+                    <li>
+                      <a href="javascript:render_bar_chart('category', bar_chart_data.category.non_stacked, 'Wholesale')">Wholesale</a>
+                    </li>
+                    <li>
+                      <a href="javascript:render_bar_chart('category', bar_chart_data.category.non_stacked, 'Aggregation')">Aggregation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a class="close-link">
+                    <i class="fa fa-close"></i>
+                  </a>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <div id="category" style="height:370px;"></div>
+          </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-sm-4 col-xs-12">
+      <div class="x_panel">
+          <div class="x_title">
+            <h2>Count of Complaints & Disputes by Risk Factor</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li>
+                  <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                  </a>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                    <i class="fa fa-wrench"></i>
+                  </a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li>
+                      <a href="javascript:render_stacked_bar_chart('risk_factor', bar_chart_data.risk_factor.stacked)">Group</a>
+                    </li>
+                    <li>
+                      <a href="javascript:render_bar_chart('risk_factor', bar_chart_data.risk_factor.non_stacked, 'Banking')">Banking</a>
+                    </li>
+                    <li>
+                      <a href="javascript:render_bar_chart('risk_factor', bar_chart_data.risk_factor.non_stacked, 'Wholesale')">Wholesale</a>
+                    </li>
+                    <li>
+                      <a href="javascript:render_bar_chart('risk_factor', bar_chart_data.risk_factor.non_stacked, 'Aggregation')">Aggregation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a class="close-link">
+                    <i class="fa fa-close"></i>
+                  </a>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <div id="risk_factor" style="height:370px;"></div>
+          </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-sm-4 col-xs-12">
+      <div class="x_panel">
+          <div class="x_title">
+            <h2>Sum of Actual Complaint Loss by Category</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li>
+                  <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                  </a>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                    <i class="fa fa-wrench"></i>
+                  </a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li>
+                      <a href="javascript:render_stacked_bar_chart('actual_loss', bar_chart_data.actual_loss.stacked)">Group</a>
+                    </li>
+                    <li>
+                      <a href="javascript:render_bar_chart('actual_loss', bar_chart_data.actual_loss.non_stacked, 'Banking')">Banking</a>
+                    </li>
+                    <li>
+                      <a href="javascript:render_bar_chart('actual_loss', bar_chart_data.actual_loss.non_stacked, 'Wholesale')">Wholesale</a>
+                    </li>
+                    <li>
+                      <a href="javascript:render_bar_chart('actual_loss', bar_chart_data.actual_loss.non_stacked, 'Aggregation')">Aggregation</a>
+                    </li>
+
+                  </ul>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <div id="actual_loss" style="height:370px;"></div>
+          </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-sm-4 col-xs-12">
+      <div class="x_panel">
+          <div class="x_title">
+            <h2>Sum of Potential Complaint Loss by Category</h2>
+            <ul class="nav navbar-right panel_toolbox">
+                <li>
+                  <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                  </a>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                    <i class="fa fa-wrench"></i>
+                  </a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li>
+                      <a href="javascript:render_stacked_bar_chart('potential_loss', bar_chart_data.potential_loss.stacked)">Group</a>
+                    </li>
+                    <li>
+                      <a href="javascript:render_bar_chart('potential_loss', bar_chart_data.potential_loss.non_stacked, 'Banking')">Banking</a>
+                    </li>
+                    <li>
+                      <a href="javascript:render_bar_chart('potential_loss', bar_chart_data.potential_loss.non_stacked, 'Wholesale')">Wholesale</a>
+                    </li>
+                    <li>
+                      <a href="javascript:render_bar_chart('potential_loss', bar_chart_data.potential_loss.non_stacked, 'Aggregation')">Aggregation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a class="close-link">
+                    <i class="fa fa-close"></i>
+                  </a>
+                </li>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <div id="potential_loss" style="height:370px;"></div>
+          </div>
+      </div>
+    </div>
+</div>
+
+{% endblock charts %}
+
+{% block custom_js%}
+<script>
+    var heatmap_data = {{ heatmap_data|safe }}
+    var bar_chart_data = {{ bar_chart_data|safe }};
+    var gauges_data = {{ gauges_data|safe}}
+
+
+    Object.keys(bar_chart_data).forEach(function(chart_id){
+      var stacked_data = bar_chart_data[chart_id].stacked
+      render_stacked_bar_chart(chart_id, stacked_data)
+    })
+    gauges_data.forEach(function(data){
+      bu = data.business_unit
+      count = data.count
+      max_number = bu=="Group"?50:20
+      render_gauge(`open_complaint_${bu}`, count, "Open Complaints",max_number )
+    })
+    Object.keys(heatmap_data).forEach(function(chart_id){
+        var chart_data = heatmap_data[chart_id]
+        var chart_name = heatmap_data[chart_id]["chart_name"]
+        render_heatmap(chart_id, chart_data, "Banking", chart_name);
+    })
+
+
+
+</script>
+{% endblock custom_js%}

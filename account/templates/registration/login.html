@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<form method="POST" action="." id="signup-form" class="signup-form">
+    <h2 class="form-title">Log In</h2>
+    <h5 class="form-title">Username is your registered email</h5>
+    {% if form.errors %}
+    <p>Your username and password didn't match. Please try again.</p>
+    {% endif %}
+    {% for field in form %}
+
+    <div class="form-group">
+        {% render_field field class+="form-input" placeholder=field.label %}
+    </div>
+
+    {% endfor %}
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{% url "dashboard:index" %}" />
+    <div class="form-group">
+        <input type="submit" name="submit" id="submit" class="form-submit" value="Sign in"/>
+    </div>
+
+</form>
+
+<p class="loginhere">
+    Forgotten your password? <a href="{% url "password_reset" %}" class="loginhere-link">Reset Password</a><br>
+    Don't have an account? <a href="{% url "register" %}" class="loginhere-link">Sign Up</a>
+</p>
+
+{% endblock %}
