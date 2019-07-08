@@ -1,4 +1,4 @@
-Django==2.2.2
+Django==2.2.3
 django-admin-rangefilter==0.4.0
 django-taggit==0.22.2
 django-widget-tweaks==1.4.3
